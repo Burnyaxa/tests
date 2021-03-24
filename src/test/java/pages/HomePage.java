@@ -12,14 +12,17 @@ import org.openqa.selenium.support.PageFactory;
 public class HomePage {
     private WebDriver driver;
 
-    @FindBy(xpath = "//*[@id=\"innerLayout\"]/header/div/div/ul/li[2]/div/a")
-    private WebElement login;
+    @FindBy(xpath = "/html/body/div[5]/div[1]/nav/div/ul/li[5]/a")
+    private WebElement loginButton;
 
-    @FindBy(id = "headerSearch")
-    private WebElement searcher;
+    @FindBy(xpath = "/html/body/div[5]/div[1]/nav/div/ul/li[4]/a")
+    private WebElement registrationButton;
 
-    @FindBy(id = "changeLang")
-    private WebElement changeLang;
+    @FindBy(name = "search")
+    private WebElement searchBar;
+
+    @FindBy(css = "#p-lang > div > ul > li.interlanguage-link.interwiki-be > a")
+    private WebElement changeLocalization;
 
     public HomePage(WebDriver driver) {
         PageFactory.initElements(driver, this);
@@ -27,15 +30,19 @@ public class HomePage {
     }
 
     public void search(String input) {
-        searcher.sendKeys(input);
-        searcher.submit();
+        searchBar.sendKeys(input);
+        searchBar.submit();
     }
 
-    public void changeLang() {
-        changeLang.click();
+    public void goToLogin(){
+        loginButton.click();
+    }
+
+    public void changeLocalization() {
+        changeLocalization.click();
     }
 
     public void goToRegistration() {
-        login.click();
+        registrationButton.click();
     }
 }

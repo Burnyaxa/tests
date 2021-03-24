@@ -1,16 +1,12 @@
 package tests;
 
 import org.junit.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import pages.HomePage;
 import pages.LoginPage;
 import pages.RegisterPage;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class AuthTest {
     private static WebDriver driver;
@@ -22,48 +18,61 @@ public class AuthTest {
         System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
         System.out.println("start");
         driver = new ChromeDriver();
-        // full size window
         driver.manage().window().maximize();
     }
 
-    //    xpath example
     @Test
-    public void testRedirectToRegisterPage() {
-        driver.get("https://www.olx.ua/uk/");
+    public void testChangeLocalizationRedirectsToHomePage() throws InterruptedException {
+        driver.get("https://uk.wikipedia.org/wiki/%D0%93%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0_%D1%81%D1%82%D0%BE%D1%80%D1%96%D0%BD%D0%BA%D0%B0");
+        Thread.sleep(3000);
         homePage = new HomePage(driver);
-        homePage.getLogin().click();
-        Assert.assertEquals(driver.getCurrentUrl(), "https://www.olx.ua/uk/account/?ref%5B0%5D%5Baction%5D=myaccount&ref%5B0%5D%5Bmethod%5D=index");
-    }
-
-//    id example
-    @Test
-    public void testIsRobot() {
-        driver.get("https://www.olx.ua/uk/");
-        homePage = new HomePage(driver);
-        homePage.goToRegistration();
-        LoginPage loginPage = new LoginPage(driver);
-        loginPage.loginUser("ggxmtpvgnqckmxfefb@niwghx.com", "String1@");
-        Assert.assertEquals("Не вдалося підтвердити користувача.", loginPage.textOfError());
+        homePage.changeLocalization();
+        Assert.assertEquals("https://be.wikipedia.org/wiki/%D0%93%D0%B0%D0%BB%D0%BE%D1%9E%D0%BD%D0%B0%D1%8F_%D1%81%D1%82%D0%B0%D1%80%D0%BE%D0%BD%D0%BA%D0%B0",
+                driver.getCurrentUrl());
     }
 
     @Test
-    public void testRegisterNewUser() {
-        driver.get("https://www.olx.ua/uk/");
+    public void testRedirectToLoginPage() {
+        driver.get("https://uk.wikipedia.org/wiki/%D0%93%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0_%D1%81%D1%82%D0%BE%D1%80%D1%96%D0%BD%D0%BA%D0%B0/");
+        homePage = new HomePage(driver);
+        homePage.getLoginButton().click();
+        Assert.assertEquals("https://uk.wikipedia.org/w/index.php?title=%D0%A1%D0%BF%D0%B5%D1%86%D1%96%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0:%D0%92%D1%85%D1%96%D0%B4&returnto=%D0%93%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0+%D1%81%D1%82%D0%BE%D1%80%D1%96%D0%BD%D0%BA%D0%B0%2F",
+                driver.getCurrentUrl());
+    }
+
+    @Test
+    public void testRegistrationWithEmptyCaptchaRemainsName() throws InterruptedException {
+        driver.get("https://uk.wikipedia.org/wiki/%D0%93%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0_%D1%81%D1%82%D0%BE%D1%80%D1%96%D0%BD%D0%BA%D0%B0/");
         homePage = new HomePage(driver);
         homePage.goToRegistration();
-        LoginPage loginPage = new LoginPage(driver);
-        loginPage.goToRegisterPage();
+        Thread.sleep(3000);
         RegisterPage registerPage = new RegisterPage(driver);
-        registerPage.registerUser("ggxmtpvgnqckmxfefb"+ ThreadLocalRandom.current().nextInt(1000, 9999 + 1) + "@gmail.com", "String1@");
-        wait = new WebDriverWait(driver, 15);
-        wait.until(ExpectedConditions.elementToBeClickable(By.className("login-box-confirm__link")));
-        Assert.assertEquals("Підтвердження", driver.getTitle());
+        registerPage.registerUser("CoolNewUser", "supersecretpassword", "abracadabra@gmail.com", "wrongcaptcha");
+        Assert.assertEquals("CoolNewUser", registerPage.getName().getAttribute("value"));
+    }
+
+    @Test
+    public void testLogInWrongCredentialsReturnsError() throws InterruptedException {
+        driver.get("https://uk.wikipedia.org/wiki/%D0%93%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0_%D1%81%D1%82%D0%BE%D1%80%D1%96%D0%BD%D0%BA%D0%B0/");
+        homePage = new HomePage(driver);
+        homePage.goToLogin();
+        Thread.sleep(3000);
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.loginUser("DoNotExist", "donotexist");
+        Assert.assertEquals("Ви ввели хибне ім'я користувача або пароль. Будь ласка, спробуйте знову.", loginPage.getError().getText());
+    }
+
+    @Test
+    public void testSearchCorrectTitle(){
+        driver.get("https://uk.wikipedia.org/wiki/%D0%93%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0_%D1%81%D1%82%D0%BE%D1%80%D1%96%D0%BD%D0%BA%D0%B0/");
+        homePage = new HomePage(driver);
+        var stringToSearch = "Selenium";
+        homePage.search(stringToSearch);
+        Assert.assertEquals(stringToSearch + " - Вікіпедія", driver.getTitle());
     }
 
     @After
     public void teardown() {
         driver.quit();
     }
-
-
 }

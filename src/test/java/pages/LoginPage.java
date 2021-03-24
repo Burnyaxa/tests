@@ -11,23 +11,20 @@ import org.openqa.selenium.support.PageFactory;
 public class LoginPage {
     private WebDriver driver;
 
-    @FindBy(id = "userEmail")
-    private WebElement email;
+    @FindBy(id = "wpName1")
+    private WebElement name;
 
-    @FindBy(id = "userPass")
+    @FindBy(id = "wpPassword1")
     private WebElement password;
 
-    @FindBy(id = "se_userLogin")
+    @FindBy(id = "wpLoginAttempt")
     private WebElement submit;
 
-    @FindBy(id = "recaptcha-anchor")
-    private WebElement checker;
-
-    @FindBy(xpath = "//*[@id=\"loginForm\"]/div/p")
+    @FindBy(xpath = "/html/body/div[3]/div[3]/div[4]/div[1]/div[3]/form/div[1]")
     private WebElement error;
 
-    @FindBy(id = "register_tab")
-    private WebElement registerTab;
+    @FindBy(linkText = "Створити обліковий запис")
+    private WebElement registration;
 
     public LoginPage(WebDriver driver) {
         PageFactory.initElements(driver, this);
@@ -35,18 +32,18 @@ public class LoginPage {
     }
 
     public void loginUser(String username, String passwd) {
-        email.sendKeys(username);
+        name.click();
+        name.sendKeys(username);
+        password.click();
         password.sendKeys(passwd);
-        submit.click();
+        submit.submit();
     }
 
     public void goToRegisterPage() {
-        registerTab.click();
+        registration.click();
     }
 
-    public String textOfError() {
+    public String getTextOfError() {
         return error.getText();
     }
-
-
 }

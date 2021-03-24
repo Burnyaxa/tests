@@ -11,28 +11,50 @@ import org.openqa.selenium.support.PageFactory;
 public class RegisterPage {
     private WebDriver driver;
 
-    @FindBy(id = "userEmailPhoneRegister")
+    @FindBy(id = "wpEmail")
     private WebElement email;
 
-    @FindBy(id = "userPassRegister")
+    @FindBy(name = "wpName")
+    private WebElement name;
+
+    @FindBy(name = "wpPassword")
     private WebElement password;
 
-    @FindBy(id = "button_register")
+    @FindBy(css = "#wpRetype")
+    private WebElement confirmPassword;
+
+    @FindBy(name = "captchaWord")
+    private WebElement captcha;
+
+    @FindBy(xpath = "/html/body/div[3]/div[3]/div[4]/div[1]/div[2]/form/div[1]")
+    private WebElement error;
+
+    @FindBy(id = "wpCreateaccount")
     private WebElement submit;
 
-    @FindBy(xpath = "//*[@id=\"registerForm\"]/div[3]/div/div/label")
-    private WebElement checker;
 
     public RegisterPage(WebDriver driver) {
         PageFactory.initElements(driver, this);
         this.driver = driver;
     }
 
-    public void registerUser(String username, String passwd) {
-        email.sendKeys(username);
-        password.sendKeys(passwd);
-        checker.click();
-        submit.click();
+    public void registerUser(String username, String passwordValue, String emailAddress, String captchaValue) throws InterruptedException {
+        name.click();
+        name.sendKeys(username);
+
+        password.click();
+        password.sendKeys(passwordValue);
+
+        confirmPassword.click();
+        confirmPassword.sendKeys(passwordValue);
+
+        email.click();
+        email.sendKeys(emailAddress);
+
+        captcha.click();
+        captcha.sendKeys(captchaValue);
+
+        submit.submit();
     }
 
 }
