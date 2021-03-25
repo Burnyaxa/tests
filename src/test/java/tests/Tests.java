@@ -8,7 +8,7 @@ import pages.HomePage;
 import pages.LoginPage;
 import pages.RegisterPage;
 
-public class AuthTest {
+public class Tests {
     private static WebDriver driver;
     private WebDriverWait wait;
     private HomePage homePage;
